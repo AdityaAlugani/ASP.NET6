@@ -5,7 +5,8 @@ namespace CityInfo.API
     public class CitiesDataStore
     {
         public List<CityDto> cities;
-        static public CitiesDataStore citystore = new CitiesDataStore()
+        //static public CitiesDataStore citystore = new CitiesDataStore();
+        public CitiesDataStore()
         {
             cities = new List<CityDto>()
             {
@@ -30,7 +31,7 @@ namespace CityInfo.API
                     }
                 },
                 new CityDto()
-                { 
+                {
                     Id=3,
                     Name="Jerussalam",
                     Description="Isaraeili city",
@@ -40,7 +41,7 @@ namespace CityInfo.API
                         new pointsOfInterestDto(){id=8,Name="name3",description="description3" }
                     }
                 }
-            }
-        };
+            };
+        }
     }
 }

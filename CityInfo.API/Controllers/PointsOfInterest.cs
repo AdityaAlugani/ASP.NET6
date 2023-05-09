@@ -11,11 +11,13 @@ namespace CityInfo.API.Controllers
     public class PointsOfInterest : ControllerBase
     {
         private readonly ILogger<PointsOfInterest> _logger;
-        private readonly LocalMailService _mailservice;
-        public PointsOfInterest(ILogger<PointsOfInterest> logger,LocalMailService mailservice)
+        private readonly IMailService _mailservice;
+        private readonly CitiesDataStore _citiesDataStore;
+        public PointsOfInterest(ILogger<PointsOfInterest> logger,IMailService mailservice, CitiesDataStore citiesDataStore)
         {
             _logger = logger;
             _mailservice = mailservice;
+            _citiesDataStore = citiesDataStore;
         }
         [HttpGet]
         public ActionResult<IEnumerable<pointsOfInterestDto>> getPoints(int cityId)
@@ -23,7 +25,7 @@ namespace CityInfo.API.Controllers
             try
             {
                 //throw new Exception("demo exception");
-                CityDto city = CitiesDataStore.citystore.cities.FirstOrDefault(city => city.Id == cityId);
+                CityDto city = _citiesDataStore.cities.FirstOrDefault(city => city.Id == cityId);
                 if (city == null)
                 {
                     _logger.LogInformation("The City you are trying to find is not found");
@@ -40,7 +42,7 @@ namespace CityInfo.API.Controllers
         [HttpGet("{id}",Name ="getpoint")]
         public ActionResult<pointsOfInterestDto> getPoint(int cityid,int id)
         {
-            CityDto city = CitiesDataStore.citystore.cities.FirstOrDefault(city => city.Id == cityid);
+            CityDto city = _citiesDataStore.cities.FirstOrDefault(city => city.Id == cityid);
             if (city == null)
             {
                 return NotFound();
@@ -53,10 +55,10 @@ namespace CityInfo.API.Controllers
         [HttpPost("createpointofinterest")]
         public ActionResult<pointsOfInterestDto> createpointofinterest(int cityid, [FromBody] pointsOfInterestForCreatingDto creation)
         {
-            CityDto city=CitiesDataStore.citystore.cities.FirstOrDefault(city=>city.Id==cityid);
+            CityDto city= _citiesDataStore.cities.FirstOrDefault(city=>city.Id==cityid);
             if (city == null)
                 return NotFound();
-            int max_id=CitiesDataStore.citystore.cities.SelectMany(city => city.pointsofinterest).Max(pointinterest => pointinterest.id);
+            int max_id= _citiesDataStore.cities.SelectMany(city => city.pointsofinterest).Max(pointinterest => pointinterest.id);
             pointsOfInterestDto newlycreated = new pointsOfInterestDto()
             {
                 id = ++max_id,
@@ -70,7 +72,7 @@ namespace CityInfo.API.Controllers
         public ActionResult UpdatePointOfInterest(int cityid,int pointofinterestid, [FromBody] UpdatePointOfInterestDto update)
         {
             
-            CityDto city=CitiesDataStore.citystore.cities.FirstOrDefault(city=>city.Id==cityid);
+            CityDto city= _citiesDataStore.cities.FirstOrDefault(city=>city.Id==cityid);
             if(city == null) 
                 return NotFound();
 
@@ -90,7 +92,7 @@ namespace CityInfo.API.Controllers
         public ActionResult PartialUpdatePointOfInterest(int cityid, int pointofinterestid, [FromBody] JsonPatchDocument<UpdatePointOfInterestDto> Patch)
         {
 
-            CityDto city = CitiesDataStore.citystore.cities.FirstOrDefault(city => city.Id == cityid);
+            CityDto city = _citiesDataStore.cities.FirstOrDefault(city => city.Id == cityid);
             if (city == null)
                 return NotFound();
 
@@ -123,7 +125,7 @@ namespace CityInfo.API.Controllers
         [HttpDelete("{pointofinterestid}")]
         public ActionResult Deletepointofinterest(int cityid,int pointofinterestid)
         {
-            CityDto city=CitiesDataStore.citystore.cities.FirstOrDefault(c => c.Id == cityid);
+            CityDto city= _citiesDataStore.cities.FirstOrDefault(c => c.Id == cityid);
             if (city == null) return NotFound();
             pointsOfInterestDto interest = city.pointsofinterest.FirstOrDefault(interest => interest.id == pointofinterestid);
             if(interest== null) return NotFound();

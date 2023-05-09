@@ -1,12 +1,18 @@
 ﻿namespace CityInfo.API.Services
 {
-    public class LocalMailService
+    public class LocalMailService : IMailService
     {
-        private string senttomail="abc@gmail.com";
-        private string sentfrommail="demo@gmail.com";
-        public void send(string message,string description)
+        private readonly string senttomail = String.Empty;
+        private readonly string sentfrommail = String.Empty;
+
+        public LocalMailService(IConfiguration config)
         {
-            Console.WriteLine($"Sent from {senttomail}"+$" to {sentfrommail}");
+            sentfrommail = config["mailservices:frommail"];
+            senttomail = config["mailservices:tomail"];
+        }
+        public void send(string message, string description)
+        {
+            Console.WriteLine($"Sent from {sentfrommail}" + $" to {senttomail}");
             Console.WriteLine(message);
             Console.WriteLine(description);
         }
